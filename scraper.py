@@ -3,10 +3,19 @@ import os
 from pathlib import Path
 from bs4 import BeautifulSoup
 from ddgs import DDGS
+from transformers import pipeline
+
+class Location:
+    def __init__(self):
+        pass
+    
+    def output_locate(self):
+        OUTPUT_FILE = os.path.join(Path(__file__).parent,'output.txt') 
+        return OUTPUT_FILE
 
 def save_output(location,data):
-    output_file = 'output.txt'
-    with open(os.path.join(location,output_file),'a',encoding='utf-8') as f:
+    loc = Location()
+    with open(loc.output_locate(),'a',encoding='utf-8') as f:
         f.write(data)
 
 def beautify_html(html_content):
