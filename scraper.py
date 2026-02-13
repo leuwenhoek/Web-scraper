@@ -178,13 +178,12 @@ def trending(keyword):
 
 def send_notification(title,msg):
     try:
-        notification.notify(title=title, message=msg, timeout=3, app_name="Post Automation")
+        notification.notify(title=title, message=msg, timeout=3, app_name="Post Automation")        #type: ignore
     except: pass
 
 def main():
     console.clear()
     
-    # Corrected way to create a centered header
     header_panel = Panel(
         Align.center("[bold cyan]AI CONTENT AUTOMATION ENGINE[/bold cyan]"),
         subtitle="v2.0 - Research & Social",
@@ -194,25 +193,44 @@ def main():
 
     keyword = console.input("[bold yellow]Enter trend keyword (e.g. AI, Finance, Space): [/bold yellow]")
     
-    with console.status("[bold green]Analyzing market trends...") as status:
-        best_topic = trending(keyword)
     
-    rprint(Panel(f"[bold white]{best_topic}[/bold white]", title="AI Strategy Recommendation", border_style="green"))
+    while True:
+        with console.status("[bold green]Analyzing market trends...") as status:
+            best_topic = trending(keyword)
+
+        rprint(Panel(f"[bold white]{best_topic}[/bold white]", title="AI Strategy Recommendation", border_style="green"))
+        send_notification("AI Strategy Recommendation", "AI Strategy Recommendation is ready.")
+        recommendation_repeat = console.input("[bold red]What another Recommendation (y/n): [/bold red]")
+
+        if recommendation_repeat.lower() == 'n':
+            break
     
     search_for = console.input("[bold yellow]What specific topic should I research? [/bold yellow]")
-    
     scrape_sites(search_for)
     
-    with console.status("[bold magenta]Synthesizing research summary...") as status:
-        raw_summary = summary()
-        summary_response = load_model(model, f"Topic: {search_for}\n\n-Summary:\n{raw_summary}\n\nInstructions:\n{prompt.format_summary()}\n\nReturn ONLY the new summary:")
-        save_data(loc.summary_locate(), summary_response)
-    
+    while True:    
+        with console.status("[bold magenta]Synthesizing research summary...") as status:
+            raw_summary = summary()
+            summary_response = load_model(model, f"Topic: {search_for}\n\n-Summary:\n{raw_summary}\n\nInstructions:\n{prompt.format_summary()}\n\nReturn ONLY the new summary:")
+            rprint(Panel(f"[bold white]{summary_response}[/bold white]", title="AI Summary", border_style="green"))
+        send_notification("Summary Created", "Summary is ready.")
+        summary_repeat = console.input("[bold red]What another Summary (y/n): [/bold red]")
+
+        if summary_repeat.lower() == 'n':
+            break
+
+    save_data(loc.summary_locate(), summary_response)
     rprint(f"[bold green]✔[/bold green] Deep-dive summary saved to: [underline]{loc.summary_locate()}[/underline]")
 
-    with console.status("[bold blue]Crafting social media post...") as status:
-        x_content = post.X(summary_response)
-        save_data(loc.post('x'), x_content)
+    while True:    
+        with console.status("[bold blue]Crafting social media post...") as status:
+            x_content = post.X(summary_response)
+            save_data(loc.post('x'), x_content)
+        send_notification("Post Created", "Post(s) are ready.")
+        post_repeat = console.input("[bold red]What another Summary (y/n): [/bold red]")
+
+        if post_repeat.lower() == 'n':
+            break
     
     rprint(Panel(x_content if x_content is not None else "[No X post generated]", title="Generated X Post", border_style="blue"))
     rprint("\n[bold cyan]Process Complete![/bold cyan] 🚀")
